@@ -1,0 +1,95 @@
+╭────────────────╮
+│ quantityOnHand │
+╞════════════════╡     1. This query selects the quantity available for the items from the item table
+│            100 │        and uses a 'WHERE' statement to make sure it only returns the quantity for the item
+╰────────────────╯        that is 'bottle of antibiotics.'
+╭───────────────╮
+│ volunteerName │
+╞═══════════════╡      2. This query selects the volunteer names from the volunteer table and only displaying
+│ Gene Lewin    │         the ones where their telephone number doesn't contain the number 2 and their last name is 
+╰───────────────╯         not Jones. We do this by using 'NOT LIKE' so it can pattern match and choose the ones that fit the conditions.
+╭───────────────╮
+│ volunteerName │
+╞═══════════════╡      3. This query selects volunteer names. The volunteer table joins to the assignment table (volunteerId), assignment joins to the task table (taskCode), and task joins to the task_type table
+│ George Brewer │         (taskTypeId), so each volunteer is connected to the type of task they work on. The WHERE statement only keeps the tasks with the type ‘transporting’.
+╰───────────────╯
+╭────────────────────────────────╮
+│        taskDescription         │    4. This query selects task descriptions and uses a LEFT JOIN with the assignment table so every task is kept, even ones with no assignment.
+╞════════════════════════════════╡       The WHERE statement with IS NULL only keeps the tasks that have no match in assignment, which means no volunteer has been assigned to them.
+│ Prepare 100 food packages      │
+│ Take packages to the warehouse │
+╰────────────────────────────────╯
+╭─────────────────╮
+│ packageTypeName │    5. This query starts with the item table, which joins to package_contents (itemId), then package_contents joins to package (packageId), and package joins to package_type
+╞═════════════════╡       (packageTypeId), so each item is connected to the type of package it is in. The WHERE statement uses LIKE ‘%bottle%’ to find any item with bottle in its description, and DISTINCT
+│ food and water  │       makes sure each package type is only shown once.
+╰─────────────────╯
+╭───────────────────────╮
+│    itemDescription    │   6. This query selects item descriptions and uses a LEFT JOIN with package_contents so all of the items are kept. The WHERE statement with IS NULL
+╞═══════════════════════╡      only keeps the items that do not appear in package_contents, which means they are not in any package.
+│ bottle of antibiotics │
+│ bottle of aspirin     │
+│ flashlight            │
+│ pack of bandages      │
+╰───────────────────────╯
+╭────────────────────────────────╮
+│        taskDescription         │     7. This query selects task descriptions. The task table joins to the assignment table (taskCode), and assignment joins to the volunteer table (volunteerId),
+╞════════════════════════════════╡        so each task is connected to the volunteers working on it. The WHERE statement uses LIKE ‘%NJ%’
+│ Prepare 20 children's packages │        to only keep volunteers with a New Jersey address, and DISTINCT makes sure the same task description is not repeated.
+│ Prepare 100 water packages     │
+│ Prepare 5,000 packages         │
+╰────────────────────────────────╯
+╭───────────────╮
+│ volunteerName │     8. This query selects volunteer names. The volunteer table joins to the assignment table (volunteerId) to get the start date of each assignment.
+╞═══════════════╡        The WHERE statement uses BETWEEN to only keep assignments that started between January 1 and July 1, 2021,
+│ Joan Simmons  │        which is the first half of the year.
+│ Chris Jordan  │
+╰───────────────╯
+╭───────────────╮
+│ volunteerName │     9. This query selects volunteer names. The volunteer table joins to assignment (volunteerId), assignment joins to task (taskCode), and task joins to 
+╞═══════════════╡        task_type (taskTypeId)to find the packing tasks. From task, it also joins to package (taskCode), package joins to package_contents (packageId),
+│ Julie White   │        and package_contents joins to item (itemId), so each volunteer is connected to the items in the packages their task made.
+│ Gerry Banks   │        The WHERE statement only keeps packing tasks where the item is ‘can of spam’, and DISTINCT makes sure each volunteer is only shown once.
+╰───────────────╯
+╭─────────────────╮
+│ itemDescription │  10. This query joins the item table to the package_contents table (itemId) so it can use both the value of an item and how many of it are in a package.
+╞═════════════════╡      The WHERE statement multiplies itemValue by itemQuantity to get the total value of that item in one package, and only keeps the ones that equal exactly 100.
+│ Baby formula    │
+╰─────────────────╯
+╭────────────────┬────────────────╮
+│ taskStatusName │ volunteerCount │    11. This query starts with the assignment table, which joins to the task table (taskCode), and task joins to the task_status table (taskStatusId),
+╞════════════════╪════════════════╡        so each volunteer assignment is connected to the status of its task. GROUP BY puts the rows into one group for each status, COUNT(DISTINCT volunteerId)
+│ open           │              4 │        counts each volunteer once in each group, and ORDER BY DESC sorts the counts from highest to lowest.
+│ closed         │              3 │
+│ ongoing        │              2 │
+│ pending        │              1 │
+╰────────────────┴────────────────╯
+╭──────────┬─────────────╮
+│ taskCode │ totalWeight │     12. This query joins the task table to the package table (taskCode), so each package is connected to the task that created it. GROUP BY puts the packages
+╞══════════╪═════════════╡         into one group for each task, SUM adds up the weights of the packages in each group, ORDER BY totalWeight DESC puts the heaviest task first, and LIMIT 1 only shows that one.
+│      106 │       308.0 │
+╰──────────┴─────────────╯
+╭────────────╮
+│ taskTypeNo │     13. This query joins the task table to the task_type table (taskTypeId) to get the type of each task. The WHERE statement uses NOT LIKE to leave 
+╞════════════╡         out the tasks with the type ‘packing’, and COUNT counts how many tasks are left.
+│          3 │
+╰────────────╯
+╭─────────────────╮
+│ itemDescription │     14. This query starts with the item table, which joins to package_contents (itemId), package_contents joins to package (packageId), and package joins to
+╞═════════════════╡         assignment (taskCode), so each item is connected to the volunteers assigned to the task that packed it. GROUP BY puts the rows into one group
+│ can of spam     │         for each item, and HAVING only keeps the items where COUNT(DISTINCT volunteerId) is less than 3, so each volunteer is only counted once per item.
+│ dried fruit     │
+│ men's coat      │
+│ sleeping bag    │
+│ tent            │
+│ women's coat    │
+╰─────────────────╯
+╭───────────┬───────────────────╮
+│ packageId │ packageTotalValue │       15. This query starts with the item table, which joins to package_contents (itemId), and package_contents joins to package (packageId), so each item is connected
+╞═══════════╪═══════════════════╡           to the package it is in. It multiplies itemValue by itemQuantity to get the value of each item in a package. GROUP BY gives one group per package,
+│         6 │             150.0 │           SUM adds up the total value, HAVING only keeps the packages with a total over 100, and ORDER BY sorts them from lowest to highest.
+│         2 │             151.0 │
+│         4 │             350.0 │
+│        10 │             750.0 │
+│         5 │            1420.0 │
+╰───────────┴───────────────────╯
